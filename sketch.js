@@ -247,6 +247,7 @@ function spawnObstacles() {
     pipe.velocityY = 3;
     pipe.scale = 0.4;
     pipe.lifetime = 200;
+    pipe.setCollider("rectangle", 0, 0, 180, 420);
     obstacleGroup.add(pipe);
 
     var bullet = createSprite(pipe.x, pipe.y, 300, 300);
