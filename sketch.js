@@ -1,10 +1,10 @@
 var mario, wall, castleWall, logo, startButton, gameOver, replayButton;
 var marioStanding, marioJumping;
-var wallImage, logoImage, startImage, castleWallImage, windowImage, brickImage, spikeImage, gameOverImage, replayImage, ladderImage, pipeImage, bulletImage;
+var wallImage, logoImage, startImage, castleWallImage, windowImage, brickImage, spikeImage, gameOverImage, replayImage, ladderImage, pipeImage, bulletImage, coinImage;
 var jumpSound, endSound;
-var windowGroup, brickGroup, obstacleGroup, ladderGroup;
+var windowGroup, brickGroup, obstacleGroup, ladderGroup, coinGroup;
 var gameState = "Start";
-var r;
+var r, score = 0;
 
 function preload() {
   marioStanding = loadImage("mario-standing.png");
@@ -21,6 +21,7 @@ function preload() {
   ladderImage = loadImage("ladder.png");
   pipeImage = loadImage("pipe.png");
   bulletImage = loadImage("bullet.png");
+  coinImage = loadImage("coin.png");
   
   jumpSound = loadSound("mario-jump.mp3");
   endSound = loadSound("mario-death.mp3");
@@ -66,6 +67,7 @@ function setup() {
   brickGroup = createGroup();
   obstacleGroup = createGroup();
   ladderGroup = createGroup();
+  coinGroup = createGroup();
 }
 
 function draw() {
@@ -139,6 +141,10 @@ function draw() {
     if (mario.isTouching(ladderGroup)) {
       mario.velocityY = -1;
     }
+    if(mario.isTouching(coinGroup)){
+      score = score + 1;
+      coinGroup.destroyEach();
+    }
     
     //create a random variable which will be used for random spawning
     r = Math.round(random(1, 2));
@@ -154,6 +160,7 @@ function draw() {
     brickGroup.destroyEach();
     obstacleGroup.destroyEach();
     ladderGroup.destroyEach();
+    coinGroup.destroyEach();
 
     gameOver.visible = true;
     replayButton.visible = true;
@@ -166,12 +173,18 @@ function draw() {
   }
 
   drawSprites();
+  
+  if(score > 0){
+    textSize(24);
+    fill("white");
+    text("Coins Collected: " + score, 400, 560);
+  }
 }
 
 function spawnWindows() {
 
   if (frameCount % 100 === 0) {
-    var window = createSprite(Math.round(random(70, 530)), -50, 50, 50);
+    var window = createSprite(Math.round(random(80, 520)), -50, 50, 50);
     window.addImage(windowImage);
     window.velocityY = 3;
     window.scale = 0.5;
@@ -186,6 +199,13 @@ function spawnWindows() {
     brick.depth = mario.depth - 1;
     brick.lifetime = 200;
     brickGroup.add(brick);
+    
+    var coin = createSprite(brick.x, window.y + 20,10,10);
+    coin.addImage(coinImage);
+    coin.velocityY = 3;
+    coin.scale = 0.075;
+    coin.lifetime = 120;
+    coinGroup.add(coin);
 
     if (r === 1) {
       var spike = createSprite(window.x, brick.y + 30, 50, 50);
@@ -240,6 +260,7 @@ function spawnObstacles() {
 
 function restart() {
   gameState = "Start";
+  score = 0;
   
   mario.x = 300;
   mario.y = 300;
