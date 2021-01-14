@@ -29,3 +29,5 @@ Left and right arrow key - to move mario
 1.1 - I added a scoring system. Collect the coins to increase your score.
 
 1.2 - Final score can now be viewed in the game over screen. New high score mechanic added. High score can be viewed only at the game over screen.
+
+Small bug fix - Fixed the collider radius of the pipe so that the game will be over only if mario exactly touches the edge of the pipe. Previously, the collider was too big and the game got over before mario could visibly touch the pipe.
