@@ -4,7 +4,8 @@ var wallImage, logoImage, startImage, castleWallImage, windowImage, brickImage, 
 var jumpSound, endSound;
 var windowGroup, brickGroup, obstacleGroup, ladderGroup, coinGroup;
 var gameState = "Start";
-var r, score = 0;
+var r;
+var score = 0, hiScore = 0;
 
 function preload() {
   marioStanding = loadImage("mario-standing.png");
@@ -158,7 +159,17 @@ function draw() {
     mario.addImage(marioStanding);
     mario.scale = 0.07;
     mario.setCollider("rectangle", 0, 0, 1000, 1000);
-
+    
+    //show the final score
+    textSize(36);
+    fill("black");
+    text("Coins Collected: " + score, 160, 360);
+    
+    if(score >= hiScore){
+       hiScore = score;
+     }
+    text("High Score: " + hiScore, 160, 400);
+    
     wall.visible = false;
     windowGroup.destroyEach();
     brickGroup.destroyEach();
