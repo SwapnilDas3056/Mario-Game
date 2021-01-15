@@ -1,8 +1,8 @@
 var mario, wall, castleWall, logo, startButton, gameOver, replayButton;
 var marioStanding, marioJumping;
-var wallImage, logoImage, startImage, castleWallImage, windowImage, brickImage, spikeImage, gameOverImage, replayImage, ladderImage, pipeImage, bulletImage, coinImage;
+var wallImage, logoImage, startImage, castleWallImage, doorImage, brickImage, spikeImage, gameOverImage, replayImage, ladderImage, pipeImage, bulletImage, coinImage;
 var jumpSound, endSound;
-var windowGroup, brickGroup, obstacleGroup, ladderGroup, coinGroup;
+var doorGroup, brickGroup, obstacleGroup, ladderGroup, coinGroup;
 var gameState = "Start";
 var r;
 var score = 0, hiScore = 0;
@@ -14,7 +14,7 @@ function preload() {
   logoImage = loadImage("game-logo.png");
   startImage = loadImage("start.png");
   castleWallImage = loadImage("castle-wall.png");
-  windowImage = loadImage("window.png");
+  doorImage = loadImage("window.png");
   brickImage = loadImage("window-brick.png");
   spikeImage = loadImage("spike.png");
   gameOverImage = loadImage("gameover.png");
@@ -26,6 +26,7 @@ function preload() {
 
   jumpSound = loadSound("mario-jump.mp3");
   endSound = loadSound("mario-death.mp3");
+  coinSound = loadSound("coin-sound.mp3");
 }
 
 function setup() {
@@ -64,7 +65,7 @@ function setup() {
   replayButton.scale = 0.4;
   replayButton.visible = false;
 
-  windowGroup = createGroup();
+  doorGroup = createGroup();
   brickGroup = createGroup();
   obstacleGroup = createGroup();
   ladderGroup = createGroup();
@@ -96,14 +97,14 @@ function draw() {
 
     mario.visible = true;
     wall.visible = true;
-    windowGroup.setVisibleEach(true);
+    doorGroup.setVisibleEach(true);
     brickGroup.setVisibleEach(true);
     obstacleGroup.setVisibleEach(true);
 
     //allow mario to jump using space bar
     if (keyWentDown("space")) {
       mario.addImage(marioJumping);
-      mario.velocityY = -15;
+      mario.velocityY = - (15 + score/30);
       jumpSound.play();
       mario.scale = 0.21;
       mario.setCollider("rectangle", 0, 0, 300, 300);
@@ -126,7 +127,7 @@ function draw() {
     mario.velocityY = mario.velocityY + 0.5;
 
     //make a scrolling wall
-    wall.velocityY = 3;
+    wall.velocityY = 3 + (score/30);
 
     if (wall.y > 490) {
       wall.y = 300;
@@ -135,7 +136,7 @@ function draw() {
     if (mario.isTouching(brickGroup)) {
       mario.velocityY = 0;
     }
-    if (mario.isTouching(obstacleGroup) || mario.y > 650) {
+    if (mario.isTouching(obstacleGroup) || mario.y > 650 || mario.y < - 50|| mario.x < -50 || mario.x > 650) {
       gameState = "End";
       endSound.play();
     }
@@ -144,6 +145,8 @@ function draw() {
     }
     if (mario.isTouching(coinGroup)) {
       score = score + 1;
+      coinSound.play();
+      coinSound.volume = 0.5;
       coinGroup.destroyEach();
     }
 
@@ -151,7 +154,7 @@ function draw() {
     r = Math.round(random(1, 2));
 
     //call the functions
-    spawnWindows();
+    spawnDoors();
     spawnObstacles();
 
   } else if (gameState === "End") {
@@ -171,7 +174,7 @@ function draw() {
     text("High Score: " + hiScore, 160, 400);
     
     wall.visible = false;
-    windowGroup.destroyEach();
+    doorGroup.destroyEach();
     brickGroup.destroyEach();
     obstacleGroup.destroyEach();
     ladderGroup.destroyEach();
@@ -192,49 +195,49 @@ function draw() {
   if (score > 0) {
     textSize(24);
     fill("white");
-    text("Coins Collected: " + score, 20, 560);
+    text("Coins Collected: " + score, 20, 570);
   }
 }
 
-function spawnWindows() {
+function spawnDoors() {
 
   if (frameCount % 100 === 0) {
-    var window = createSprite(Math.round(random(80, 520)), -50, 50, 50);
-    window.addImage(windowImage);
-    window.velocityY = 3;
-    window.scale = 0.5;
-    window.depth = mario.depth - 1;
-    window.lifetime = 200;
-    windowGroup.add(window);
+    var door = createSprite(Math.round(random(80, 520)), -50, 50, 50);
+    door.addImage(doorImage);
+    door.velocityY = 3 + (score/30);
+    door.scale = 0.5;
+    door.depth = mario.depth - 1;
+    door.lifetime = 650/door.velocityY;
+    doorGroup.add(door);
 
-    var brick = createSprite(window.x, window.y + 80, 50, 50);
+    var brick = createSprite(door.x, door.y + 80, 50, 50);
     brick.addImage(brickImage);
-    brick.velocityY = 3;
+    brick.velocityY = door.velocityY;
     brick.scale = 0.6;
     brick.depth = mario.depth - 1;
-    brick.lifetime = 200;
+    brick.lifetime = 600/brick.velocityY;
     brickGroup.add(brick);
 
-    var coin = createSprite(brick.x, window.y + 20, 10, 10);
+    var coin = createSprite(brick.x, door.y + 20, 10, 10);
     coin.addImage(coinImage);
-    coin.velocityY = 3;
+    coin.velocityY = door.velocityY;
     coin.scale = 0.075;
-    coin.lifetime = 110;
+    coin.lifetime = 330/coin.velocityY;
     coinGroup.add(coin);
 
     if (r === 1) {
-      var spike = createSprite(window.x, brick.y + 30, 50, 50);
+      var spike = createSprite(door.x, brick.y + 30, 50, 50);
       spike.addImage(spikeImage);
-      spike.velocityY = 3;
+      spike.velocityY = door.velocityY;
       spike.scale = 0.12;
-      spike.lifetime = 200;
+      spike.lifetime = 600/spike.velocityY;
       obstacleGroup.add(spike);
     } else if (r === 2) {
-      var ladder = createSprite(window.x, brick.y + 50, 50, 50);
+      var ladder = createSprite(door.x, brick.y + 50, 50, 50);
       ladder.addImage(ladderImage);
-      ladder.velocityY = 3;
+      ladder.velocityY = door.velocityY;
       ladder.scale = 0.35;
-      ladder.lifetime = 200;
+      ladder.lifetime = 600/ladder.velocityY;
       ladderGroup.add(ladder);
     }
   }
@@ -242,30 +245,30 @@ function spawnWindows() {
 
 function spawnObstacles() {
   if (frameCount % 420 === 0) {
-    var pipe = createSprite(0, 0, 300, 300);
+    var pipe = createSprite(0, -150, 300, 300);
     pipe.addImage(pipeImage);
-    pipe.velocityY = 3;
+    pipe.velocityY = 3 + (score/30);
     pipe.scale = 0.4;
-    pipe.lifetime = 200;
+    pipe.lifetime = 750/pipe.velocityY;
     pipe.setCollider("rectangle", 0, 0, 180, 420);
     obstacleGroup.add(pipe);
-
+    
     var bullet = createSprite(pipe.x, pipe.y, 300, 300);
     bullet.addImage(bulletImage);
     bullet.scale = 0.1;
     bullet.depth = pipe.depth - 1;
-    bullet.velocityY = 3;
-    bullet.lifetime = 200;
+    bullet.velocityY = pipe.velocityY;
+    bullet.lifetime = 600/bullet.velocityY;
     obstacleGroup.add(bullet);
 
     if (r === 1) {
-      pipe.x = 40;
+      pipe.x = Math.round(random(20,50));
       pipe.rotation = 90;
       bullet.x = 50;
       bullet.rotation = 0;
       bullet.velocityX = 5;
     } else if (r === 2) {
-      pipe.x = 560;
+      pipe.x = Math.round(random(550,580));
       pipe.rotation = -90;
       bullet.x = 550;
       bullet.rotation = -180;
