@@ -30,4 +30,4 @@ Left and right arrow key - to move mario
 
 1.2 - Final score can now be viewed in the game over screen. New high score mechanic added. High score can be viewed only at the game over screen.
 
-Small bug fix - Fixed the collider radius of the pipe so that the game will be over only if mario exactly touches the edge of the pipe. Previously, the collider was too big and the game got over before mario could visibly touch the pipe.
+1.3 - New coin sound added. Collecting coins will now play a sound. Game adaptivity added. The speed and difficulty of the game will increase when your score will increase. Minor bug fixes.
