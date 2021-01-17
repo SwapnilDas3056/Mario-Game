@@ -32,4 +32,6 @@ Left and right arrow key - to move mario
 
 1.3 - New coin sound added. Collecting coins will now play a sound. Game adaptivity added. The speed and difficulty of the game will increase when your score will increase. Minor bug fixes.
 
-1.4 - New enemies, goombas and koopas added. The enemies will appear when the score reaches 15.
+1.4 - More enemies, goombas and koopas added. The enemies will appear after the score reaches 15.
+
+1.5 - New enemy, "boos" or ghosts added. They will appear when the score reaches 32. Mario now looks in the direction it moves. Small bug fixes.
